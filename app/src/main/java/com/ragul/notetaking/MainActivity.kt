@@ -13,6 +13,7 @@ import androidx.navigation.navArgument
 import com.ragul.notetaking.Authentication.LoginScreen
 import com.ragul.notetaking.Authentication.SignupScreen
 import com.ragul.notetaking.ui.viewmodel.NoteViewModel
+import com.ragul.notetaking.ui.viewmodel.AuthViewModel
 import com.ragul.notetaking.ui.screens.HomeScreen
 import com.ragul.notetaking.ui.screens.NoteEditorScreen
 import com.ragul.notetaking.ui.theme.NoteTakingTheme
@@ -22,10 +23,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val noteViewModel: NoteViewModel by viewModels()
+        val authViewModel: AuthViewModel by viewModels()
         setContent {
             NoteTakingTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = Router.Signup) {
+                val startDestination = if (authViewModel.isSignedIn()) Router.Home else Router.Signup
+                NavHost(navController = navController, startDestination = startDestination) {
                     composable(Router.Signup) {
                         SignupScreen(navController)
                     }

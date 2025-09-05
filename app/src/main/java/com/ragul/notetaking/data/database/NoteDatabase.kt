@@ -7,13 +7,16 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.ragul.notetaking.data.dao.NoteDao
 import com.ragul.notetaking.data.model.Note
+import com.ragul.notetaking.data.model.User
+import com.ragul.notetaking.data.dao.UserDao
 import com.ragul.notetaking.data.util.Converters
 
-@Database(entities = [Note::class], version = 1, exportSchema = false)
+@Database(entities = [Note::class, User::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class NoteDatabase : RoomDatabase() {
     
     abstract fun noteDao(): NoteDao
+    abstract fun userDao(): UserDao
     
     companion object {
         @Volatile

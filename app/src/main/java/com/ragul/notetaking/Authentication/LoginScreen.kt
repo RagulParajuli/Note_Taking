@@ -17,11 +17,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,13 +37,52 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ragul.notetaking.ui.viewmodel.AuthViewModel
+import kotlinx.coroutines.launch
 import com.ragul.notetaking.Preview.PreviewLightDark
 import com.ragul.notetaking.R
 import com.ragul.notetaking.Router
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 
 @Composable
 fun LoginScreen(navController: NavController) {
     val context = LocalContext.current
+    val authViewModel: AuthViewModel = viewModel()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    // Google Sign-In setup
+    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken(context.getString(R.string.default_web_client_id))
+        .requestEmail()
+        .build()
+    val googleClient: GoogleSignInClient = GoogleSignIn.getClient(context, gso)
+    val googleLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
+            val idToken = account.idToken
+            if (idToken != null) {
+                authViewModel.signInWithGoogle(idToken) { ok, err ->
+                    if (ok) {
+                        navController.navigate(Router.Home) {
+                            popUpTo(Router.Login) { inclusive = true }
+                        }
+                    } else {
+                        scope.launch { snackbarHostState.showSnackbar(err ?: "Google sign-in failed") }
+                    }
+                }
+            }
+        } catch (e: ApiException) {
+            scope.launch { snackbarHostState.showSnackbar("Google sign-in error: ${e.statusCode}") }
+        }
+    }
     
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -121,7 +164,7 @@ fun LoginScreen(navController: NavController) {
                     .fillMaxWidth()
                     .background(Color(0xFFE0E0E0), shape = RoundedCornerShape(8.dp))
                     .clickable {
-                        // Handle Google login
+                        googleLauncher.launch(googleClient.signInIntent)
                     }
                     .padding(vertical = 12.dp, horizontal = 16.dp),
                 contentAlignment = Alignment.Center
@@ -149,13 +192,25 @@ fun LoginScreen(navController: NavController) {
                     .fillMaxWidth()
                     .background(Color(0xFF0023FF), shape = RoundedCornerShape(8.dp))
                     .clickable {
-                        navController.navigate(Router.Home)
+                        if (email.isBlank() || password.isBlank()) return@clickable
+                        authViewModel.signInWithEmail(email, password) { ok, err ->
+                            if (ok) {
+                                navController.navigate(Router.Home) {
+                                    popUpTo(Router.Login) { inclusive = true }
+                                }
+                            } else {
+                                scope.launch { snackbarHostState.showSnackbar(err ?: "Login failed") }
+                            }
+                        }
                     }
                     .padding(vertical = 12.dp, horizontal = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = "Log In", fontSize = 16.sp, color = Color.White)
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            SnackbarHost(hostState = snackbarHostState)
 
             Spacer(modifier = Modifier.height(16.dp))
 

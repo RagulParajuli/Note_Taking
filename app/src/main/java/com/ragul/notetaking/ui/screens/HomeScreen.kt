@@ -28,6 +28,8 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,12 +53,14 @@ import com.ragul.notetaking.ui.components.NoteItem
 import com.ragul.notetaking.ui.components.SwipeableNoteItem
 import com.ragul.notetaking.ui.components.ColorSelector
 import com.ragul.notetaking.ui.viewmodel.NoteViewModel
+import com.ragul.notetaking.ui.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
     val noteViewModel: NoteViewModel = viewModel()
+    val authViewModel: AuthViewModel = viewModel()
     val notes by noteViewModel.allNotes.collectAsState()
     val undoAvailable by noteViewModel.undoAvailable.observeAsState(false)
     val snackbarHostState = remember { SnackbarHostState() }
@@ -86,7 +90,18 @@ fun HomeScreen(navController: NavController) {
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                ),
+                actions = {
+                    TextButton(onClick = {
+                        authViewModel.signOut {
+                            navController.navigate(Router.Signup) {
+                                popUpTo(Router.Home) { inclusive = true }
+                            }
+                        }
+                    }) {
+                        Text("Sign out")
+                    }
+                }
             )
         },
         floatingActionButton = {
