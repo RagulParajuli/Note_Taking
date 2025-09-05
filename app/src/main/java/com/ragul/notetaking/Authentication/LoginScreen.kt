@@ -43,6 +43,7 @@ import kotlinx.coroutines.launch
 import com.ragul.notetaking.Preview.PreviewLightDark
 import com.ragul.notetaking.R
 import com.ragul.notetaking.Router
+import com.google.firebase.auth.FirebaseAuth
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -129,7 +130,21 @@ fun LoginScreen(navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        navController.navigate(Router.ForgotPassword)
+                        if (email.isBlank()) {
+                            scope.launch { snackbarHostState.showSnackbar("Enter your email first") }
+                        } else {
+                            FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+                                .addOnCompleteListener { task ->
+                                    scope.launch {
+                                        if (task.isSuccessful) {
+                                            snackbarHostState.showSnackbar("Password reset email sent")
+                                        } else {
+                                            snackbarHostState.showSnackbar(task.exception?.localizedMessage
+                                                ?: "Failed to send email")
+                                        }
+                                    }
+                                }
+                        }
                     }
             )
 
