@@ -67,12 +67,10 @@ dependencies {
     implementation ("androidx.navigation:navigation-compose:2.9.3")
     // Firebase Auth
     implementation("com.google.firebase:firebase-auth:24.0.1")
-    //room db
-    // Room Database
-    implementation ("androidx.room:room-runtime:2.5.2")  // Replace with the latest version
-    implementation ("androidx.room:room-ktx:2.5.2")  // Kotlin Extensions for Room
-    annotationProcessor ("androidx.room:room-compiler:2.5.2")  // For Java users
-    kapt ("androidx.room:room-compiler:2.5.2")  // For Kotlin users
+    // Room Database (use latest stable and only kapt for Kotlin)
+    implementation ("androidx.room:room-runtime:2.6.1")
+    implementation ("androidx.room:room-ktx:2.6.1")
+    kapt ("androidx.room:room-compiler:2.6.1")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.2")  // For lifecycle components if using ViewModel
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.5.2")  // For LiveData
     implementation ("androidx.compose.runtime:runtime-livedata:1.5.4")  // For LiveData observation in Compose

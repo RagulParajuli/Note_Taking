@@ -32,6 +32,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,7 +57,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(navController: NavController) {
     val noteViewModel: NoteViewModel = viewModel()
-    val notes by noteViewModel.allNotes.observeAsState(initial = emptyList())
+    val notes by noteViewModel.allNotes.collectAsState()
     val undoAvailable by noteViewModel.undoAvailable.observeAsState(false)
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -124,15 +125,13 @@ fun HomeScreen(navController: NavController) {
                 items(notes) { note ->
                     SwipeableNoteItem(
                         note = note,
-                        onNoteClick = {
-                            // Previously navigated to edit screen, now open inline editor by default
-                            selectedNote = it
+                        onNoteClick = { clickedNote ->
+                            navController.navigate(Router.editNoteRoute(clickedNote.id))
                         },
                         onDelete = { noteToDelete ->
                             noteViewModel.deleteNote(noteToDelete)
                         },
                         onLongPress = { longPressedNote ->
-                            // Keep existing behavior for long press (navigate to full editor)
                             navController.navigate(Router.editNoteRoute(longPressedNote.id))
                         }
                     )

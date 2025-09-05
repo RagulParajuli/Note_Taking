@@ -6,7 +6,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
@@ -38,16 +39,17 @@ import com.ragul.notetaking.data.model.Note
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SwipeableNoteItem(
-    note: Int,
+    note: Note,
     onNoteClick: (Note) -> Unit,
     onDelete: (Note) -> Unit,
     onLongPress: (Note) -> Unit
 ) {
     var offsetX by remember { mutableStateOf(0f) }
     var isDeleted by remember { mutableStateOf(false) }
-    val deleteThreshold = 150f // Absolute threshold for deletion
+    val deleteThreshold = 150f // Absolute threshold for right-swipe deletion
     
     // State for dropdown menu
     var showDropdownMenu by remember { mutableStateOf(false) }
@@ -66,23 +68,6 @@ fun SwipeableNoteItem(
                 fadeOut(animationSpec = tween(durationMillis = 300))
     ) {
         Box {
-            // Delete background - left swipe (shows on right)
-            if (offsetX < 0) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Red)
-                        .padding(end = 16.dp),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete",
-                        tint = Color.White
-                    )
-                }
-            }
-            
             // Delete background - right swipe (shows on left)
             if (offsetX > 0) {
                 Box(
@@ -104,33 +89,27 @@ fun SwipeableNoteItem(
             Box(
                 modifier = Modifier
                     .offset { IntOffset(offsetX.roundToInt(), 0) }
+                    .combinedClickable(
+                        onClick = { onNoteClick(note) },
+                        onLongClick = {
+                            showDropdownMenu = true
+                        }
+                    )
                     .draggable(
                         orientation = Orientation.Horizontal,
                         state = rememberDraggableState { delta ->
-                            // Allow swiping in both directions
-                            offsetX += delta
+                            // Only allow swiping to the right for deletion visual
+                            val newOffset = offsetX + delta
+                            offsetX = if (newOffset < 0f) 0f else newOffset
                         },
                         onDragStopped = {
-                            if (offsetX < -deleteThreshold || offsetX > deleteThreshold) {
-                                isDeleted = true
-                            } else {
-                                // Spring back
-                                offsetX = 0f
-                            }
+                            // Trigger delete only when swiped to the right beyond threshold
+                            isDeleted = offsetX > deleteThreshold
+                            if (!isDeleted) offsetX = 0f
                         }
                     )
-                    .pointerInput(note) {
-                        detectTapGestures(
-                            onLongPress = { offset -> 
-                                // Show dropdown menu at long press position
-                                pressPosition = offset
-                                showDropdownMenu = true 
-                            },
-                            onTap = { onNoteClick(note) }
-                        )
-                    }
             ) {
-                NoteItem(note = note, onNoteClick = {})
+                NoteItem(note = note, onNoteClick = onNoteClick)
                 
                 // Dropdown menu for long press
                 DropdownMenu(
