@@ -1,3 +1,7 @@
+### To download Apk of this app
+  ## 1.Click Note Taking.apk file
+  ## 2.Either click view raw or Download raw (file only runs on android mobile)
+
 ## Note Taking (Jetpack Compose, Room, Firebase Auth)
 
 An Android notes app built with Kotlin and Jetpack Compose. It supports email/password and Google sign-in via Firebase Authentication, and stores notes locally using Room. Notes can be created, edited, deleted (with undo), searched, pinned, archived, and color‑coded.
