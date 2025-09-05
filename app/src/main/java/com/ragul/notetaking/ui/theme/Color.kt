@@ -43,3 +43,5 @@ val noteColors = listOf(
     LightLime,
     LightIndigo
 )
+
+val Black = Color(0xFF000000)

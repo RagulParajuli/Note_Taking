@@ -44,6 +44,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.ragul.notetaking.R
 import com.ragul.notetaking.Router
+import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun SignupScreen(navController: NavController) {
@@ -196,7 +197,7 @@ fun SignupScreen(navController: NavController) {
                     .padding(vertical = 12.dp, horizontal = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "Sign up", fontSize = 16.sp, color = Color.White)
+                Text(text = "Sign up", fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -213,7 +214,7 @@ fun SignupScreen(navController: NavController) {
                         text = "Already have an account?",
                         modifier = Modifier.fillMaxWidth(),
                         fontSize = 16.sp,
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onBackground,
                         textAlign = TextAlign.Center
                     )
 

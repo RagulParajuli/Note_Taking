@@ -51,6 +51,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -221,7 +222,7 @@ fun LoginScreen(navController: NavController) {
                     .padding(vertical = 12.dp, horizontal = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "Log In", fontSize = 16.sp, color = Color.White)
+                Text(text = "Log In", fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -238,7 +239,7 @@ fun LoginScreen(navController: NavController) {
                         text = "Don't have an account?",
                         modifier = Modifier.fillMaxWidth(),
                         fontSize = 16.sp,
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onBackground,
                         textAlign = TextAlign.Center
                     )
 
