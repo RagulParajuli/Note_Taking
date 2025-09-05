@@ -1,6 +1,6 @@
 ## To download Apk of this app
   - 1.Click Note Taking.apk file
-  - 2.Either click view raw or Download raw (file only runs on android mobile)
+  - 2.Either click view raw or Download raw (Only runs on android mobile)
 
 ## Note Taking (Jetpack Compose, Room, Firebase Auth)
 
