@@ -4,7 +4,7 @@
 
 ## Note Taking (Jetpack Compose, Room, Firebase Auth)
 
-An Android notes app built with Kotlin and Jetpack Compose. It supports email/password and Google sign-in via Firebase Authentication, and stores notes locally using Room. Notes can be created, edited, deleted (with undo), searched, pinned, archived, and color‑coded.
+An Android notes app built with Kotlin and Jetpack Compose. It supports email/password and Google sign-in via Firebase Authentication, and stores notes locally using Room. Notes can be created, edited, deleted (with undo) and color‑coded.
 
 ### Features
 - **Authentication**: Email/password and Google sign-in
